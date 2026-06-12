@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StickySignal — Revenue Driver, Not Cost Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#10b981; --primary-light:#34d399; --primary-dark:#059669;
+  --secondary:#3b82f6; --accent:#06b6d4; --accent-light:#22d3ee;
+  --purple:#8b5cf6;
+  --bg:#050508; --bg2:#0a0a0f; --panel:rgba(17,24,39,.7); --panel-solid:#111827;
+  --fg:#fafafa; --text:#e5e7eb; --text2:#94a3b8; --muted:#71717a;
+  --success:#22c55e; --warning:#f59e0b; --danger:#ef4444;
+  --border:rgba(148,163,184,.2);
+  --serif:'Outfit',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-family:var(--serif)}
+
+/* ---------- STAGE ---------- */
+#stage{position:fixed;inset:0;background:var(--bg);overflow:hidden}
+#stage::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 55% at 50% 42%,rgba(16,185,129,.09) 0%,rgba(6,182,212,.04) 45%,transparent 75%);
+  pointer-events:none}
+
+/* ---------- CINEMATIC DRESSING ---------- */
+.letterbox{position:fixed;left:0;right:0;height:5vh;background:#000;z-index:60;pointer-events:none}
+.letterbox.top{top:0}.letterbox.bottom{bottom:0}
+.vignette{position:fixed;inset:0;z-index:50;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.65) 100%)}
+.grain{position:fixed;inset:-100px;z-index:55;pointer-events:none;opacity:.08;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  animation:grain .6s steps(4) infinite}
+@keyframes grain{
+  0%{transform:translate(0,0)}25%{transform:translate(-40px,30px)}
+  50%{transform:translate(30px,-45px)}75%{transform:translate(-25px,-20px)}100%{transform:translate(0,0)}}
+
+.hud{position:fixed;top:calc(5vh + 16px);left:24px;z-index:70;display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text2)}
+.hud .dot{width:8px;height:8px;border-radius:50%;background:var(--danger);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.timecode{position:fixed;top:calc(5vh + 16px);right:24px;z-index:70;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--text2)}
+.rail{position:fixed;left:0;bottom:5vh;height:1px;width:100%;background:rgba(148,163,184,.15);z-index:70}
+.rail .fill{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--accent));
+  box-shadow:0 0 8px rgba(16,185,129,.6)}
+.hint{position:fixed;bottom:calc(5vh + 12px);left:50%;transform:translateX(-50%);z-index:70;
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  opacity:.7}
+
+/* ---------- SCENE ENGINE ---------- */
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s ease;padding:8vh 6vw;text-align:center}
+.scene.active{opacity:1;z-index:10}
+.scene.exiting{opacity:0;transition:opacity .3s ease;z-index:5}
+
+/* eyebrow + headline pattern */
+.eyebrow{font-family:var(--mono);font-size:clamp(10px,1.2vw,13px);letter-spacing:.28em;text-transform:uppercase;
+  color:var(--accent-light);margin-bottom:clamp(14px,2.4vh,26px);
+  opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease;
+  transition-delay:calc(var(--d,0) * .7s)}
+.scene.active .eyebrow{opacity:1;transform:none}
+
+.headline{font-size:clamp(30px,5.6vw,72px);font-weight:800;line-height:1.08;color:var(--fg);
+  letter-spacing:-.02em;max-width:18ch}
+.headline .w{display:inline-block;opacity:0;filter:blur(10px);transform:translateY(18px);
+  transition:opacity .7s ease,filter .7s ease,transform .7s ease;
+  transition-delay:calc(var(--d,0) * .7s)}
+.scene.active .headline .w{opacity:1;filter:blur(0);transform:none}
+.headline .acc{font-style:italic;font-weight:700;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 60%,var(--secondary) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-right:.06em}
+
+.sub{font-size:clamp(14px,1.7vw,20px);font-weight:300;color:var(--text2);max-width:52ch;line-height:1.6;
+  margin-top:clamp(14px,2.4vh,24px);
+  opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease;
+  transition-delay:calc(var(--d,0) * .7s)}
+.scene.active .sub{opacity:1;transform:none}
+
+/* generic artifact reveal (explicit-seconds variant) */
+.seq{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;
+  transition-delay:var(--ed,.3s)}
+.scene.active .seq{opacity:1;transform:none}
+
+/* ============ SCENE 1 — COLD OPEN ============ */
+#scene1 .brandmark{font-family:var(--mono);font-size:clamp(11px,1.3vw,14px);letter-spacing:.42em;
+  text-transform:uppercase;color:var(--text2);margin-bottom:28px;
+  opacity:0;transition:opacity 1s ease .2s}
+#scene1.active .brandmark{opacity:1}
+
+/* ============ SCENE 2 — THE LEAK ============ */
+.churn-panel{width:min(560px,88vw);background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:18px 22px;margin-top:clamp(18px,3vh,32px);backdrop-filter:blur(12px);text-align:left}
+.churn-row{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:11px 4px;border-bottom:1px solid rgba(148,163,184,.1);font-size:clamp(12px,1.4vw,15px)}
+.churn-row:last-child{border-bottom:none}
+.churn-row .who{display:flex;align-items:center;gap:10px;color:var(--text)}
+.churn-row .avatar{width:26px;height:26px;border-radius:50%;flex:none;
+  background:linear-gradient(135deg,var(--secondary),var(--purple));opacity:.85}
+.churn-row .last{font-family:var(--mono);font-size:clamp(10px,1.1vw,12px);color:var(--text2)}
+.scene.active .churn-row.fades{animation:fadeRow 1.6s ease forwards}
+.scene.active .churn-row.f1{animation-delay:2.2s}
+.scene.active .churn-row.f2{animation-delay:2.7s}
+.scene.active .churn-row.f3{animation-delay:3.2s}
+@keyframes fadeRow{to{opacity:.18;filter:grayscale(1)}}
+.gone-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--danger);
+  border:1px solid rgba(239,68,68,.4);border-radius:99px;padding:3px 9px;opacity:0}
+.scene.active .f1 .gone-tag{animation:tagIn .4s ease 2.6s forwards}
+.scene.active .f2 .gone-tag{animation:tagIn .4s ease 3.1s forwards}
+.scene.active .f3 .gone-tag{animation:tagIn .4s ease 3.6s forwards}
+@keyframes tagIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+/* ============ SCENE 3 — 15-VISIT THESIS ============ */
+.ladder{display:flex;align-items:flex-end;gap:clamp(4px,.9vw,10px);height:clamp(140px,26vh,240px);
+  margin-top:clamp(20px,3.4vh,36px)}
+.ladder .bar{width:clamp(16px,2.6vw,34px);background:linear-gradient(180deg,rgba(148,163,184,.5),rgba(148,163,184,.15));
+  border-radius:5px 5px 0 0;transform:scaleY(0);transform-origin:bottom;
+  transition:transform .55s cubic-bezier(.22,1,.36,1);transition-delay:calc(var(--d,0) * .7s)}
+.scene.active .ladder .bar{transform:scaleY(1)}
+.ladder .bar.hot{background:linear-gradient(180deg,var(--primary-light),var(--primary-dark));
+  box-shadow:0 0 24px rgba(16,185,129,.45)}
+.ladder-label{display:flex;justify-content:space-between;width:100%;max-width:560px;
+  font-family:var(--mono);font-size:clamp(10px,1.1vw,12px);color:var(--text2);margin-top:10px;letter-spacing:.1em}
+.ltv-chip{font-family:var(--mono);font-size:clamp(12px,1.5vw,16px);color:var(--primary-light);
+  border:1px solid rgba(16,185,129,.45);background:rgba(16,185,129,.08);border-radius:99px;
+  padding:8px 18px;margin-top:clamp(16px,2.6vh,26px);letter-spacing:.06em}
+
+/* ============ SCENE 4 — THE BRIDGE ============ */
+.stack{display:flex;flex-direction:column;gap:12px;margin-top:clamp(20px,3.4vh,34px);width:min(440px,86vw)}
+.layer{border-radius:12px;padding:clamp(12px,1.8vh,18px) 20px;font-family:var(--mono);
+  font-size:clamp(11px,1.3vw,14px);letter-spacing:.14em;text-transform:uppercase}
+.layer.pos{background:rgba(148,163,184,.08);border:1px solid var(--border);color:var(--text2)}
+.layer.brain{background:linear-gradient(135deg,rgba(16,185,129,.16),rgba(6,182,212,.12));
+  border:1px solid rgba(16,185,129,.5);color:var(--primary-light);
+  box-shadow:0 0 40px rgba(16,185,129,.15)}
+
+/* ============ SCENE 5 — HERO: CADENCE WIN-BACK ============ */
+#scene5{flex-direction:row;gap:clamp(20px,4vw,64px);flex-wrap:wrap;align-content:center}
+#scene5 .left{max-width:min(460px,88vw);text-align:left;display:flex;flex-direction:column;align-items:flex-start}
+#scene5 .headline{font-size:clamp(26px,3.6vw,46px);max-width:14ch;text-align:left}
+.cadence-card{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;margin-top:20px;backdrop-filter:blur(12px)}
+.cadence-card .cust{display:flex;justify-content:space-between;align-items:center;
+  font-size:clamp(12px,1.3vw,14px);color:var(--text)}
+.cadence-card .cust .id{font-family:var(--mono);color:var(--text2);font-size:clamp(10px,1.1vw,12px)}
+.rhythm{display:flex;align-items:center;gap:6px;margin-top:14px}
+.rhythm .vdot{width:10px;height:10px;border-radius:50%;background:var(--primary);opacity:0;
+  transform:scale(.4);transition:opacity .3s ease,transform .3s ease;transition-delay:var(--ed,1s)}
+.scene.active .rhythm .vdot{opacity:1;transform:scale(1)}
+.rhythm .gap-line{flex:1;height:2px;border-top:2px dashed rgba(239,68,68,.6);opacity:0;transition:opacity .5s ease 2.4s}
+.scene.active .rhythm .gap-line{opacity:1}
+.rhythm .miss{width:12px;height:12px;border-radius:50%;border:2px dashed var(--danger);opacity:0;transition:opacity .5s ease 2.6s}
+.scene.active .rhythm .miss{opacity:1}
+.rhythm-label{font-family:var(--mono);font-size:clamp(10px,1.05vw,12px);color:var(--text2);margin-top:10px;letter-spacing:.08em}
+.alert-chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);
+  font-size:clamp(10px,1.15vw,13px);color:var(--warning);border:1px solid rgba(245,158,11,.45);
+  background:rgba(245,158,11,.08);border-radius:99px;padding:7px 14px;margin-top:16px;letter-spacing:.06em}
+
+/* phone */
+.phone{width:clamp(220px,24vw,280px);border-radius:34px;border:1px solid rgba(148,163,184,.3);
+  background:#0b0f17;padding:14px 12px 20px;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 60px rgba(6,182,212,.08);
+  text-align:left}
+.phone .notch{width:90px;height:5px;border-radius:99px;background:rgba(148,163,184,.3);margin:0 auto 14px}
+.phone .from{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text2);text-align:center;margin-bottom:12px}
+.bubble{background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;
+  border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:clamp(12px,1.25vw,14px);line-height:1.5;
+  opacity:0;transform:translateY(12px) scale(.96);max-width:100%}
+#scene5.active .bubble{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 4.2s forwards}
+@keyframes bubbleIn{to{opacity:1;transform:none}}
+.typing{display:flex;gap:5px;padding:12px 14px;background:rgba(148,163,184,.12);border-radius:16px 16px 16px 4px;
+  width:max-content;opacity:0;margin-bottom:10px;overflow:hidden;max-height:44px}
+#scene5.active .typing{animation:typeShow .35s ease 3.4s forwards,typeHide .35s ease 4.15s forwards}
+@keyframes typeShow{from{opacity:0}to{opacity:1}}
+@keyframes typeHide{to{opacity:0;max-height:0;margin-bottom:0;padding-top:0;padding-bottom:0}}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--text2);animation:tdot 1s ease infinite}
+.typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
+@keyframes tdot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.deliv{font-family:var(--mono);font-size:10px;color:var(--text2);margin-top:9px;letter-spacing:.1em;
+  opacity:0;transition:opacity .5s ease 5.4s}
+#scene5.active .deliv{opacity:1}
+.return-chip{display:flex;align-items:center;gap:8px;margin-top:14px;font-family:var(--mono);
+  font-size:clamp(10px,1.15vw,13px);color:var(--success);border:1px solid rgba(34,197,94,.5);
+  background:rgba(34,197,94,.1);border-radius:10px;padding:9px 13px;letter-spacing:.05em;
+  opacity:0;transform:translateY(10px)}
+#scene5.active .return-chip{animation:chipIn .5s cubic-bezier(.22,1,.36,1) 6.8s forwards}
+@keyframes chipIn{to{opacity:1;transform:none}}
+
+/* ============ SCENE 6 — CONDUCTOR ============ */
+.pipe-wrap{display:flex;align-items:center;gap:clamp(10px,2vw,22px);margin-top:clamp(22px,3.6vh,38px);
+  font-family:var(--mono);font-size:clamp(10px,1.2vw,13px);letter-spacing:.12em;text-transform:uppercase}
+.pipe-node{border:1px solid var(--border);border-radius:12px;padding:12px 18px;color:var(--text2);background:var(--panel)}
+.pipe-node.us{border-color:rgba(6,182,212,.55);color:var(--accent-light);
+  box-shadow:0 0 36px rgba(6,182,212,.18);background:rgba(6,182,212,.07)}
+.pipe-line{width:clamp(34px,6vw,80px);height:2px;position:relative;background:rgba(148,163,184,.25);overflow:visible}
+.pipe-line::after{content:'';position:absolute;top:-2px;left:0;width:8px;height:6px;border-radius:99px;
+  background:var(--accent-light);box-shadow:0 0 10px var(--accent-light);opacity:0}
+.scene.active .pipe-line::after{animation:packet 1.6s linear 1.4s infinite}
+@keyframes packet{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 8px);opacity:0}}
+.stat-strip{display:flex;gap:clamp(14px,3vw,40px);margin-top:clamp(20px,3.2vh,32px);flex-wrap:wrap;justify-content:center}
+.stat-strip .s{display:flex;flex-direction:column;gap:4px}
+.stat-strip .v{font-size:clamp(20px,2.8vw,34px);font-weight:800;color:var(--fg)}
+.stat-strip .v em{font-style:normal;color:var(--primary-light)}
+.stat-strip .k{font-family:var(--mono);font-size:clamp(9px,1vw,11px);letter-spacing:.18em;text-transform:uppercase;color:var(--text2)}
+
+/* ============ SCENE 7 — SHOWROOM ============ */
+.showroom-card{width:min(480px,90vw);background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  padding:20px 22px;margin-top:clamp(18px,3vh,30px);backdrop-filter:blur(12px);text-align:left;
+  box-shadow:0 18px 60px rgba(0,0,0,.5)}
+.showroom-card .top{display:flex;align-items:center;gap:14px}
+.showroom-card .face{width:46px;height:46px;border-radius:50%;flex:none;
+  background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;
+  font-weight:700;color:#06281d;font-size:16px}
+.showroom-card .nm{font-size:clamp(15px,1.7vw,18px);font-weight:600;color:var(--fg)}
+.showroom-card .meta{font-family:var(--mono);font-size:clamp(10px,1.05vw,11px);color:var(--text2);letter-spacing:.08em;margin-top:2px}
+.vip{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--warning);
+  border:1px solid rgba(245,158,11,.5);border-radius:99px;padding:4px 10px}
+.sr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.sr-cell{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 12px}
+.sr-cell .k{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.sr-cell .v{font-size:clamp(13px,1.5vw,16px);font-weight:600;color:var(--text);margin-top:4px}
+.sr-cell .v.grn{color:var(--primary-light)}
+
+/* ============ SCENE 8 — INVENTORY ============ */
+.tri{display:flex;gap:clamp(10px,1.8vw,18px);margin-top:clamp(20px,3.4vh,34px);flex-wrap:wrap;justify-content:center}
+.tri .col{width:clamp(140px,17vw,200px);border-radius:14px;padding:16px 14px;text-align:left;
+  background:var(--panel);border:1px solid var(--border)}
+.tri .col h4{font-family:var(--mono);font-size:clamp(10px,1.1vw,12px);letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px}
+.tri .good h4{color:var(--success)}.tri .bad h4{color:var(--warning)}.tri .ugly h4{color:var(--danger)}
+.tri .item{font-size:clamp(11px,1.2vw,13px);color:var(--text2);padding:7px 0;border-top:1px solid rgba(148,163,184,.1);
+  display:flex;justify-content:space-between;gap:8px}
+.tri .item b{color:var(--text);font-weight:500}
+.tri .item .velo{font-family:var(--mono);font-size:10px}
+.match-banner{margin-top:18px;font-family:var(--mono);font-size:clamp(10px,1.2vw,13px);letter-spacing:.06em;
+  color:var(--accent-light);border:1px solid rgba(6,182,212,.45);background:rgba(6,182,212,.07);
+  border-radius:99px;padding:9px 18px}
+
+/* ============ SCENE 9 — PROOF ============ */
+.metrics{display:flex;gap:clamp(12px,2.4vw,28px);margin-top:clamp(22px,3.6vh,40px);flex-wrap:wrap;justify-content:center}
+.metric{width:clamp(170px,21vw,250px);background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  padding:clamp(18px,2.6vh,28px) 18px;backdrop-filter:blur(12px)}
+.metric .num{font-size:clamp(28px,4vw,52px);font-weight:800;color:var(--fg);letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums}
+.metric.grn .num{color:var(--primary-light)}
+.metric.cyn .num{color:var(--accent-light)}
+.metric .lbl{font-family:var(--mono);font-size:clamp(9px,1vw,11px);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text2);margin-top:10px;line-height:1.7}
+
+/* ============ SCENE 10 — SIGN-OFF ============ */
+#scene10 .logo{font-size:clamp(36px,6vw,76px);font-weight:800;letter-spacing:-.03em;color:var(--fg)}
+#scene10 .logo em{font-style:normal;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 50%,var(--secondary) 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#scene10 .tag{margin-top:18px;font-size:clamp(15px,2vw,24px);font-weight:300;color:var(--text2);letter-spacing:.02em}
+#scene10 .url{margin-top:clamp(20px,3.4vh,36px);font-family:var(--mono);font-size:clamp(12px,1.4vw,16px);
+  letter-spacing:.3em;text-transform:uppercase;color:var(--primary-light)}
+
+/* ---------- MOBILE ---------- */
+@media (max-width:768px){
+  .hud,.timecode,.hint{display:none}
+  .letterbox{height:3vh}
+  .rail{bottom:3vh}
+  .scene{padding:6vh 6vw}
+  #scene5{flex-direction:column;gap:18px}
+  #scene5 .left{align-items:center;text-align:center}
+  #scene5 .headline{text-align:center}
+  .sr-grid{grid-template-columns:1fr 1fr}
+  .tri .col{width:44vw}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- SCENE 1 · COLD OPEN -->
+  <section class="scene" id="scene1">
+    <div class="brandmark">StickySignal</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.5">Your</span>
+      <span class="w" style="--d:.7">customers</span>
+      <span class="w" style="--d:.9">are</span>
+      <span class="w" style="--d:1.2">slipping</span>
+      <span class="w acc" style="--d:1.5">away.</span>
+    </h1>
+    <p class="sub" style="--d:2.4">Silently.</p>
+  </section>
+
+  <!-- SCENE 2 · THE LEAK -->
+  <section class="scene" id="scene2">
+    <div class="eyebrow" style="--d:.1">01 · THE PROBLEM</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.3">The</span>
+      <span class="w" style="--d:.5">silent</span>
+      <span class="w acc" style="--d:.8">churn.</span>
+    </h1>
+    <div class="churn-panel seq" style="--ed:1.2s">
+      <div class="churn-row fades f1">
+        <span class="who"><span class="avatar"></span>Customer #4892</span>
+        <span class="last">LAST VISIT · 34 DAYS</span>
+        <span class="gone-tag">GONE</span>
+      </div>
+      <div class="churn-row fades f2">
+        <span class="who"><span class="avatar" style="background:linear-gradient(135deg,#06b6d4,#10b981)"></span>Customer #2517</span>
+        <span class="last">LAST VISIT · 41 DAYS</span>
+        <span class="gone-tag">GONE</span>
+      </div>
+      <div class="churn-row fades f3">
+        <span class="who"><span class="avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></span>Customer #7203</span>
+        <span class="last">LAST VISIT · 56 DAYS</span>
+        <span class="gone-tag">GONE</span>
+      </div>
+    </div>
+    <p class="sub" style="--d:5.6">Email gets a 2–3% response. Nobody notices until the revenue is gone.</p>
+  </section>
+
+  <!-- SCENE 3 · THE 15-VISIT THESIS -->
+  <section class="scene" id="scene3">
+    <div class="eyebrow" style="--d:.1">02 · THE INSIGHT</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.3">Loyalty</span>
+      <span class="w" style="--d:.5">ignites</span>
+      <span class="w" style="--d:.7">at</span>
+      <span class="w" style="--d:.9">visit</span>
+      <span class="w acc" style="--d:1.2">fifteen.</span>
+    </h1>
+    <div class="ladder">
+      <div class="bar" style="height:8%;--d:1.8"></div>
+      <div class="bar" style="height:11%;--d:1.95"></div>
+      <div class="bar" style="height:13%;--d:2.1"></div>
+      <div class="bar" style="height:16%;--d:2.25"></div>
+      <div class="bar" style="height:18%;--d:2.4"></div>
+      <div class="bar" style="height:21%;--d:2.55"></div>
+      <div class="bar" style="height:24%;--d:2.7"></div>
+      <div class="bar" style="height:27%;--d:2.85"></div>
+      <div class="bar" style="height:30%;--d:3.0"></div>
+      <div class="bar" style="height:34%;--d:3.15"></div>
+      <div class="bar" style="height:38%;--d:3.3"></div>
+      <div class="bar" style="height:43%;--d:3.45"></div>
+      <div class="bar" style="height:49%;--d:3.6"></div>
+      <div class="bar" style="height:58%;--d:3.75"></div>
+      <div class="bar hot" style="height:100%;--d:3.95"></div>
+    </div>
+    <div class="ladder-label seq" style="--ed:2.9s"><span>VISIT 1</span><span>VISIT 15</span></div>
+    <div class="ltv-chip seq" style="--ed:3.4s">LIFETIME VALUE ≈ $12,000</div>
+  </section>
+
+  <!-- SCENE 4 · THE BRIDGE -->
+  <section class="scene" id="scene4">
+    <div class="eyebrow" style="--d:.1">03 · THE PLATFORM</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.3">Not</span>
+      <span class="w" style="--d:.5">a</span>
+      <span class="w" style="--d:.65">CRM.</span>
+      <span class="w" style="--d:1.1">A</span>
+      <span class="w" style="--d:1.25">revenue</span>
+      <span class="w" style="--d:1.45">recovery</span>
+      <span class="w acc" style="--d:1.7">system.</span>
+    </h1>
+    <div class="stack">
+      <div class="layer brain seq" style="--ed:2.4s">⚡ StickySignal — The Intelligence Layer</div>
+      <div class="layer pos seq" style="--ed:2.0s">Your POS · Blaze / Dutchie / Flowhub</div>
+    </div>
+    <p class="sub" style="--d:4.0">The brain that makes your POS profitable.</p>
+  </section>
+
+  <!-- SCENE 5 · HERO — CADENCE WIN-BACK -->
+  <section class="scene" id="scene5">
+    <div class="left">
+      <div class="eyebrow" style="--d:.1">04 · THE WIN-BACK ENGINE</div>
+      <h1 class="headline">
+        <span class="w" style="--d:.3">We</span>
+        <span class="w" style="--d:.5">notice</span>
+        <span class="w" style="--d:.7">when</span>
+        <span class="w" style="--d:.9">rhythm</span>
+        <span class="w acc" style="--d:1.15">breaks.</span>
+      </h1>
+      <div class="cadence-card seq" style="--ed:.9s">
+        <div class="cust"><span>Customer #4892</span><span class="id">VISITS EVERY 11 DAYS</span></div>
+        <div class="rhythm">
+          <span class="vdot" style="--ed:1.3s"></span>
+          <span class="vdot" style="--ed:1.5s"></span>
+          <span class="vdot" style="--ed:1.7s"></span>
+          <span class="vdot" style="--ed:1.9s"></span>
+          <span class="vdot" style="--ed:2.1s"></span>
+          <span class="gap-line"></span>
+          <span class="miss"></span>
+        </div>
+        <div class="rhythm-label">DAY 18 · NO VISIT · CADENCE BROKEN</div>
+      </div>
+      <div class="alert-chip seq" style="--ed:2.9s">⚠ WIN-BACK TRIGGERED — AI WRITING MESSAGE</div>
+    </div>
+    <div class="phone seq" style="--ed:3.1s">
+      <div class="notch"></div>
+      <div class="from">STICKYSIGNAL · COMPLIANT SMS</div>
+      <div class="typing"><i></i><i></i><i></i></div>
+      <div class="bubble">Hey! Your favorite sativa carts just restocked — and there's 15% off this week. We saved you one. 🌿</div>
+      <div class="deliv">DELIVERED · 98% OPEN RATE</div>
+      <div class="return-chip">✓ RETURNED IN 1.5 DAYS · $67 BASKET</div>
+    </div>
+  </section>
+
+  <!-- SCENE 6 · CONDUCTOR -->
+  <section class="scene" id="scene6">
+    <div class="eyebrow" style="--d:.1">05 · THE MOAT</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.3">We</span>
+      <span class="w" style="--d:.55">don't</span>
+      <span class="w" style="--d:.75">rent</span>
+      <span class="w" style="--d:.95">the</span>
+      <span class="w" style="--d:1.1">pipe.</span>
+      <span class="w" style="--d:1.6">We</span>
+      <span class="w acc" style="--d:1.8">are</span>
+      <span class="w acc" style="--d:2.0">it.</span>
+    </h1>
+    <div class="pipe-wrap seq" style="--ed:2.6s">
+      <div class="pipe-node us">StickySignal Conductor</div>
+      <div class="pipe-line"></div>
+      <div class="pipe-node">Carrier Network</div>
+      <div class="pipe-line"></div>
+      <div class="pipe-node">Customer</div>
+    </div>
+    <div class="stat-strip">
+      <div class="s seq" style="--ed:3.2s"><span class="v"><em>0¢</em></span><span class="k">Per-Message Cost</span></div>
+      <div class="s seq" style="--ed:3.45s"><span class="v">100<em>%</em></span><span class="k">TCPA Compliant</span></div>
+      <div class="s seq" style="--ed:3.7s"><span class="v">98<em>%</em></span><span class="k">Open Rate</span></div>
+    </div>
+  </section>
+
+  <!-- SCENE 7 · SHOWROOM -->
+  <section class="scene" id="scene7">
+    <div class="eyebrow" style="--d:.1">06 · THE SHOWROOM</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.3">Every</span>
+      <span class="w" style="--d:.5">budtender,</span>
+      <span class="w" style="--d:.85">your</span>
+      <span class="w acc" style="--d:1.1">best</span>
+      <span class="w" style="--d:1.3">budtender.</span>
+    </h1>
+    <div class="showroom-card seq" style="--ed:1.8s">
+      <div class="top">
+        <div class="face">JR</div>
+        <div>
+          <div class="nm">Customer #4892</div>
+          <div class="meta">VISIT 14 · MEMBER SINCE 2024</div>
+        </div>
+        <div class="vip">★ ONE FROM GOLD</div>
+      </div>
+      <div class="sr-grid">
+        <div class="sr-cell seq" style="--ed:2.3s"><div class="k">Lifetime Value</div><div class="v grn">$4,820</div></div>
+        <div class="sr-cell seq" style="--ed:2.45s"><div class="k">Favorite</div><div class="v">Sativa Carts</div></div>
+        <div class="sr-cell seq" style="--ed:2.6s"><div class="k">Last Visit</div><div class="v">2 days ago</div></div>
+        <div class="sr-cell seq" style="--ed:2.75s"><div class="k">Next Reward</div><div class="v grn">Visit 15 🎉</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 8 · INVENTORY -->
+  <section class="scene" id="scene8">
+    <div class="eyebrow" style="--d:.1">07 · INVENTORY INTELLIGENCE</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.3">Dead</span>
+      <span class="w" style="--d:.5">stock</span>
+      <span class="w" style="--d:.7">meets</span>
+      <span class="w" style="--d:.9">its</span>
+      <span class="w acc" style="--d:1.15">buyer.</span>
+    </h1>
+    <div class="tri">
+      <div class="col good seq" style="--ed:1.7s">
+        <h4>The Good</h4>
+        <div class="item"><b>Sativa Carts 1g</b><span class="velo">9.4/day</span></div>
+        <div class="item"><b>Gummies 100mg</b><span class="velo">7.1/day</span></div>
+      </div>
+      <div class="col bad seq" style="--ed:2.0s">
+        <h4>The Bad</h4>
+        <div class="item"><b>Pre-roll 5pk</b><span class="velo">0.8/day</span></div>
+        <div class="item"><b>Tincture 30ml</b><span class="velo">0.4/day</span></div>
+      </div>
+      <div class="col ugly seq" style="--ed:2.3s">
+        <h4>The Ugly</h4>
+        <div class="item"><b>Topical Balm</b><span class="velo">0.03/day</span></div>
+        <div class="item"><b>Beverage 12oz</b><span class="velo">0.02/day</span></div>
+      </div>
+    </div>
+    <div class="match-banner seq" style="--ed:3.1s">⟲ 312 CUSTOMERS WITH TOPICAL AFFINITY — CAMPAIGN READY</div>
+  </section>
+
+  <!-- SCENE 9 · PROOF -->
+  <section class="scene" id="scene9">
+    <div class="eyebrow" style="--d:.1">08 · THE PROOF</div>
+    <h1 class="headline">
+      <span class="w" style="--d:.3">Not</span>
+      <span class="w" style="--d:.5">theory.</span>
+      <span class="w acc" style="--d:1.0">Revenue.</span>
+    </h1>
+    <div class="metrics">
+      <div class="metric grn seq" style="--ed:1.5s">
+        <div class="num" id="m1">$0</div>
+        <div class="lbl">Recovered from 179 "dead" customers</div>
+      </div>
+      <div class="metric cyn seq" style="--ed:1.75s">
+        <div class="num" id="m2">0%</div>
+        <div class="lbl">SMS conversion vs 1–2% industry</div>
+      </div>
+      <div class="metric grn seq" style="--ed:2.0s">
+        <div class="num" id="m3">$0</div>
+        <div class="lbl">Revenue lift in 30 days · one pilot</div>
+      </div>
+    </div>
+    <p class="sub" style="--d:5.2">Every dollar attributed. Every message accounted for.</p>
+  </section>
+
+  <!-- SCENE 10 · SIGN-OFF -->
+  <section class="scene" id="scene10">
+    <div class="seq" style="--ed:.3s">
+      <div class="logo">Sticky<em>Signal</em></div>
+    </div>
+    <div class="tag seq" style="--ed:1.1s">Revenue driver. Not cost center.</div>
+    <div class="url seq" style="--ed:1.9s">stickysignal.io</div>
+  </section>
+
+</div>
+
+<!-- DRESSING -->
+<div class="letterbox top"></div>
+<div class="letterbox bottom"></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="hud"><span class="dot"></span><span>STICKYSIGNAL · PRODUCT REEL</span></div>
+<div class="timecode" id="tc">00:00:00</div>
+<div class="rail"><div class="fill" id="railFill"></div></div>
+<div class="hint">SPACE PAUSE · → SKIP · R REPLAY</div>
+
+<script>
+const scenes = [
+  { id:'scene1',  inAt: 0.0,  outAt: 4.6 },
+  { id:'scene2',  inAt: 4.6,  outAt: 11.6 },
+  { id:'scene3',  inAt: 11.6, outAt: 18.2 },
+  { id:'scene4',  inAt: 18.2, outAt: 23.4 },
+  { id:'scene5',  inAt: 23.4, outAt: 33.0 },
+  { id:'scene6',  inAt: 33.0, outAt: 38.6 },
+  { id:'scene7',  inAt: 38.6, outAt: 44.4 },
+  { id:'scene8',  inAt: 44.4, outAt: 49.6 },
+  { id:'scene9',  inAt: 49.6, outAt: 57.6 },
+  { id:'scene10', inAt: 57.6, outAt: 64.0 },
+];
+const TOTAL = 64.0;
+
+// count-up tickers: absolute timeline times
+const tickers = [
+  { el:'m1', start:51.2, end:53.4, from:0, to:13706, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
+  { el:'m2', start:51.5, end:53.7, from:0, to:22.4,  fmt:v=>v.toFixed(1)+'%' },
+  { el:'m3', start:51.8, end:54.2, from:0, to:88206, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
+];
+const easeOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
+
+let startTime = performance.now();
+let pausedAt = null;
+let pausedOffset = 0;
+
+const tcEl = document.getElementById('tc');
+const railEl = document.getElementById('railFill');
+
+function loop(now){
+  let t = (now - startTime - pausedOffset) / 1000;
+  if (pausedAt !== null) t = (pausedAt - startTime - pausedOffset) / 1000;
+  if (t > TOTAL) t = TOTAL;
+
+  for (const s of scenes){
+    const el = document.getElementById(s.id);
+    if (t >= s.inAt && t < s.outAt){
+      el.classList.add('active'); el.classList.remove('exiting');
+    } else if (t >= s.outAt && t < s.outAt + 0.5){
+      el.classList.remove('active'); el.classList.add('exiting');
+    } else {
+      el.classList.remove('active','exiting');
+    }
+  }
+
+  for (const k of tickers){
+    const el = document.getElementById(k.el);
+    if (t < k.start){ el.textContent = k.fmt(k.from); }
+    else if (t >= k.end){ el.textContent = k.fmt(k.to); }
+    else {
+      const p = easeOutExpo((t - k.start) / (k.end - k.start));
+      el.textContent = k.fmt(k.from + (k.to - k.from) * p);
+    }
+  }
+
+  const mm = String(Math.floor(t/60)).padStart(2,'0');
+  const ss = String(Math.floor(t%60)).padStart(2,'0');
+  const ff = String(Math.floor((t%1)*24)).padStart(2,'0');
+  tcEl.textContent = `${mm}:${ss}:${ff}`;
+  railEl.style.width = (t/TOTAL*100) + '%';
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function currentT(){
+  const ref = pausedAt !== null ? pausedAt : performance.now();
+  return (ref - startTime - pausedOffset) / 1000;
+}
+function reset(){
+  startTime = performance.now(); pausedOffset = 0;
+  if (pausedAt !== null) pausedAt = performance.now();
+}
+function togglePause(){
+  if (pausedAt === null){ pausedAt = performance.now(); }
+  else { pausedOffset += performance.now() - pausedAt; pausedAt = null; }
+}
+function skipNext(){
+  const t = currentT();
+  const next = scenes.find(s => s.inAt > t + 0.05);
+  if (!next) return;
+  pausedOffset -= (next.inAt - t) * 1000;
+}
+
+window.addEventListener('keydown', e => {
+  if (e.key === ' '){ e.preventDefault(); togglePause(); }
+  else if (e.key === 'r' || e.key === 'R'){ reset(); }
+  else if (e.key === 'ArrowRight'){ skipNext(); }
+});
+window.addEventListener('pointerdown', () => skipNext());
+</script>
+</body>
+</html>
