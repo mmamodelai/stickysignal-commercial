@@ -293,12 +293,32 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .stat-strip .v{font-size:clamp(20px,2.8vw,34px);font-weight:800;color:var(--fg)}
 .stat-strip .v em{font-style:normal;color:var(--primary-light)}
 .stat-strip .k{font-family:var(--mono);font-size:clamp(9px,1vw,11px);letter-spacing:.18em;text-transform:uppercase;color:var(--text2)}
-.imsg-row{display:flex;gap:10px;margin-top:clamp(16px,2.6vh,26px);flex-wrap:wrap;justify-content:center}
-.imsg-chip{font-family:var(--mono);font-size:clamp(9.5px,1.05vw,12px);letter-spacing:.07em;
-  color:#7cb8ff;border:1px solid rgba(10,132,255,.55);background:rgba(10,132,255,.1);
-  border-radius:99px;padding:8px 16px}
-.imsg-chip.hero{color:#fff;background:linear-gradient(135deg,#0a84ff,#0060df);border-color:transparent;
-  box-shadow:0 0 30px rgba(10,132,255,.35);font-weight:500}
+.blocked-row{display:flex;gap:9px;margin-top:clamp(12px,2vh,20px);flex-wrap:wrap;justify-content:center}
+.blocked-chip{font-family:var(--mono);font-size:clamp(9px,1vw,11.5px);letter-spacing:.1em;
+  color:#fca5a5;border:1px solid rgba(239,68,68,.45);background:rgba(239,68,68,.07);
+  border-radius:99px;padding:7px 14px}
+.blocked-chip b{color:var(--danger);font-weight:700;margin-left:6px}
+.vs-row{display:flex;gap:clamp(12px,2vw,24px);margin-top:clamp(14px,2.4vh,24px);
+  flex-wrap:wrap;justify-content:center}
+.vs-card{width:clamp(240px,30vw,330px);border-radius:14px;padding:14px 16px;text-align:left;
+  background:var(--panel);backdrop-filter:blur(12px)}
+.vs-card.them{border:1px solid rgba(239,68,68,.35)}
+.vs-card.us{border:1px solid rgba(16,185,129,.5);box-shadow:0 0 36px rgba(16,185,129,.12)}
+.vs-card .vh{font-family:var(--mono);font-size:clamp(9px,1vw,11px);letter-spacing:.2em;
+  text-transform:uppercase;margin-bottom:11px}
+.vs-card.them .vh{color:#fca5a5}
+.vs-card.us .vh{color:var(--primary-light)}
+.flow-step{display:flex;align-items:center;gap:9px;font-size:clamp(11px,1.2vw,13px);color:var(--text2);
+  padding:5px 0}
+.flow-step .fs-ic{flex:none;width:24px;text-align:center}
+.flow-step .arr{color:var(--muted);font-family:var(--mono)}
+.vs-foot{font-family:var(--mono);font-size:clamp(9.5px,1.05vw,12px);letter-spacing:.08em;
+  margin-top:11px;padding-top:10px;border-top:1px solid rgba(148,163,184,.12)}
+.vs-card.them .vs-foot{color:var(--danger)}
+.vs-card.us .vs-foot{color:var(--primary-light)}
+.us-bubble{background:linear-gradient(135deg,#0a84ff,#0060df);color:#fff;border-radius:14px 14px 4px 14px;
+  padding:9px 12px;font-size:clamp(11px,1.2vw,13px);line-height:1.45;max-width:92%;margin-left:auto}
+.us-direct{font-size:clamp(11px,1.2vw,13px);color:var(--text);padding:4px 0 9px}
 
 /* ============ SCENE 9 — PROOF ============ */
 .metrics{display:flex;gap:clamp(12px,2.4vw,28px);margin-top:clamp(20px,3.4vh,36px);flex-wrap:wrap;justify-content:center}
@@ -608,29 +628,41 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
   <section class="scene" id="scene8">
     <div class="eyebrow" style="--d:.1">07 · THE MOAT</div>
     <h1 class="headline">
-      <span class="w" style="--d:.3">Twilio</span>
-      <span class="w" style="--d:.55">blocks</span>
-      <span class="w" style="--d:.75">cannabis.</span>
-      <span class="w" style="--d:1.25">We</span>
-      <span class="w acc" style="--d:1.5">are</span>
-      <span class="w acc" style="--d:1.7">the carrier.</span>
+      <span class="w" style="--d:.3">They</span>
+      <span class="w" style="--d:.5">all</span>
+      <span class="w" style="--d:.7">block</span>
+      <span class="w" style="--d:.9">cannabis.</span>
+      <span class="w" style="--d:1.35">We</span>
+      <span class="w acc" style="--d:1.6">are</span>
+      <span class="w acc" style="--d:1.8">the carrier.</span>
     </h1>
-    <div class="pipe-wrap seq" style="--ed:2.4s">
+    <div class="blocked-row">
+      <span class="blocked-chip seq" style="--ed:2.0s">TWILIO<b>✕</b></span>
+      <span class="blocked-chip seq" style="--ed:2.2s">AMAZON CONNECT<b>✕</b></span>
+      <span class="blocked-chip seq" style="--ed:2.4s">VERIZON<b>✕</b></span>
+      <span class="blocked-chip seq" style="--ed:2.6s">SIGNALWIRE<b>✕</b></span>
+    </div>
+    <div class="vs-row">
+      <div class="vs-card them seq" style="--ed:3.2s">
+        <div class="vh">EVERYONE ELSE'S WORKAROUND</div>
+        <div class="flow-step seq" style="--ed:3.6s"><span class="fs-ic">🔗</span><span>SMS with a hyperlink</span><span class="arr">→</span></div>
+        <div class="flow-step seq" style="--ed:3.9s"><span class="fs-ic">🛂</span><span>Age confirmation page</span><span class="arr">→</span></div>
+        <div class="flow-step seq" style="--ed:4.2s"><span class="fs-ic">🌐</span><span>Read it on a website, in a browser</span></div>
+        <div class="vs-foot seq" style="--ed:4.8s">≈30% EVER SEE THE MESSAGE</div>
+      </div>
+      <div class="vs-card us seq" style="--ed:5.6s">
+        <div class="vh">STICKYSIGNAL</div>
+        <div class="us-direct">The message lands in their texts. That's it.</div>
+        <div class="us-bubble seq" style="--ed:6.2s">Marcus — your extracts are back. 15% off Sunday. 🌿</div>
+        <div class="vs-foot seq" style="--ed:6.9s">98% OPEN · 0¢ PER MESSAGE · 💙 iMESSAGE UPGRADE</div>
+      </div>
+    </div>
+    <div class="pipe-wrap seq" style="--ed:7.7s">
       <div class="pipe-node us">StickySignal Conductor</div>
       <div class="pipe-line"></div>
-      <div class="pipe-node">Carrier Network</div>
+      <div class="pipe-node">Private Carrier Network</div>
       <div class="pipe-line"></div>
       <div class="pipe-node">Customer</div>
-    </div>
-    <div class="stat-strip">
-      <div class="s seq" style="--ed:3.0s"><span class="v"><em>0¢</em></span><span class="k">Per-Message Cost</span></div>
-      <div class="s seq" style="--ed:3.25s"><span class="v">100<em>%</em></span><span class="k">Compliant</span></div>
-      <div class="s seq" style="--ed:3.5s"><span class="v">98<em>%</em></span><span class="k">Open Rate</span></div>
-    </div>
-    <div class="imsg-row">
-      <span class="imsg-chip hero seq" style="--ed:4.0s">💙 FULL iMESSAGE — BLUE TEXTS, OFF YOUR SHOP'S OWN iPHONE</span>
-      <span class="imsg-chip seq" style="--ed:4.4s">READ RECEIPTS · TAPBACKS · TYPING</span>
-      <span class="imsg-chip seq" style="--ed:4.7s">SMS FALLBACK FOR ANDROID</span>
     </div>
   </section>
 
@@ -690,16 +722,16 @@ const scenes = [
   { id:'scene5',  inAt: 25.4, outAt: 35.8 },
   { id:'scene6',  inAt: 35.8, outAt: 50.4 },
   { id:'scene7',  inAt: 50.4, outAt: 58.4 },
-  { id:'scene8',  inAt: 58.4, outAt: 65.4 },
-  { id:'scene9',  inAt: 65.4, outAt: 73.4 },
-  { id:'scene10', inAt: 73.4, outAt: 80.0 },
+  { id:'scene8',  inAt: 58.4, outAt: 68.4 },
+  { id:'scene9',  inAt: 68.4, outAt: 76.4 },
+  { id:'scene10', inAt: 76.4, outAt: 83.0 },
 ];
-const TOTAL = 80.0;
+const TOTAL = 83.0;
 
 const tickers = [
-  { el:'m1', start:67.0, end:69.2, from:0, to:13706, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
-  { el:'m2', start:67.3, end:69.5, from:0, to:22.4,  fmt:v=>v.toFixed(1)+'%' },
-  { el:'m3', start:67.6, end:70.0, from:0, to:61,    fmt:v=>Math.round(v)+'%' },
+  { el:'m1', start:70.0, end:72.2, from:0, to:13706, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
+  { el:'m2', start:70.3, end:72.5, from:0, to:22.4,  fmt:v=>v.toFixed(1)+'%' },
+  { el:'m3', start:70.6, end:73.0, from:0, to:61,    fmt:v=>Math.round(v)+'%' },
 ];
 const easeOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
 
