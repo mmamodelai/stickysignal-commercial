@@ -182,13 +182,26 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .phone .notch{width:90px;height:5px;border-radius:99px;background:rgba(148,163,184,.3);margin:0 auto 13px}
 .phone .from{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--text2);text-align:center;margin-bottom:11px}
-.bubble{background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;
-  border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:clamp(12px,1.25vw,14px);line-height:1.5;
+.bubble{position:relative;background:linear-gradient(135deg,#0a84ff,#0060df);color:#fff;
+  border-radius:16px 16px 4px 16px;padding:12px 14px;font-size:clamp(12px,1.25vw,14px);line-height:1.5;
+  margin-left:auto;max-width:88%;
   opacity:0;transform:translateY(12px) scale(.96)}
 #scene5.active .bubble{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 4.4s forwards}
 @keyframes bubbleIn{to{opacity:1;transform:none}}
-.typing{display:flex;gap:5px;padding:12px 14px;background:rgba(148,163,184,.12);border-radius:16px 16px 16px 4px;
-  width:max-content;opacity:0;margin-bottom:10px;overflow:hidden;max-height:44px}
+.tapback{position:absolute;top:-12px;left:-10px;width:24px;height:24px;border-radius:50%;
+  background:#1c1c1e;border:1.5px solid #0a84ff;display:flex;align-items:center;justify-content:center;
+  font-size:11px;opacity:0;transform:scale(.3)}
+#scene5.active .tapback{animation:tapbackPop .4s cubic-bezier(.34,1.56,.64,1) 7.0s forwards}
+@keyframes tapbackPop{to{opacity:1;transform:scale(1)}}
+.read-receipt{font-family:var(--mono);font-size:9.5px;color:var(--text2);text-align:right;
+  margin-top:6px;letter-spacing:.08em;opacity:0;transition:opacity .5s ease 6.3s}
+#scene5.active .read-receipt{opacity:1}
+.reply-bubble{background:#2c2c2e;color:var(--text);border-radius:16px 16px 16px 4px;
+  padding:11px 13px;font-size:clamp(12px,1.25vw,14px);line-height:1.45;margin-top:9px;max-width:80%;
+  opacity:0;transform:translateY(10px)}
+#scene5.active .reply-bubble{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 7.8s forwards}
+.typing{display:flex;gap:5px;padding:12px 14px;background:rgba(148,163,184,.12);border-radius:16px 16px 4px 16px;
+  width:max-content;margin-left:auto;opacity:0;margin-bottom:10px;overflow:hidden;max-height:44px}
 #scene5.active .typing{animation:typeShow .35s ease 3.5s forwards,typeHide .35s ease 4.35s forwards}
 @keyframes typeShow{from{opacity:0}to{opacity:1}}
 @keyframes typeHide{to{opacity:0;max-height:0;margin-bottom:0;padding-top:0;padding-bottom:0}}
@@ -280,6 +293,12 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 .stat-strip .v{font-size:clamp(20px,2.8vw,34px);font-weight:800;color:var(--fg)}
 .stat-strip .v em{font-style:normal;color:var(--primary-light)}
 .stat-strip .k{font-family:var(--mono);font-size:clamp(9px,1vw,11px);letter-spacing:.18em;text-transform:uppercase;color:var(--text2)}
+.imsg-row{display:flex;gap:10px;margin-top:clamp(16px,2.6vh,26px);flex-wrap:wrap;justify-content:center}
+.imsg-chip{font-family:var(--mono);font-size:clamp(9.5px,1.05vw,12px);letter-spacing:.07em;
+  color:#7cb8ff;border:1px solid rgba(10,132,255,.55);background:rgba(10,132,255,.1);
+  border-radius:99px;padding:8px 16px}
+.imsg-chip.hero{color:#fff;background:linear-gradient(135deg,#0a84ff,#0060df);border-color:transparent;
+  box-shadow:0 0 30px rgba(10,132,255,.35);font-weight:500}
 
 /* ============ SCENE 9 — PROOF ============ */
 .metrics{display:flex;gap:clamp(12px,2.4vw,28px);margin-top:clamp(20px,3.4vh,36px);flex-wrap:wrap;justify-content:center}
@@ -479,11 +498,12 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
     </div>
     <div class="phone seq" style="--ed:3.2s">
       <div class="notch"></div>
-      <div class="from">STICKYSIGNAL · COMPLIANT SMS</div>
+      <div class="from">💙 iMESSAGE · FROM YOUR SHOP'S iPHONE</div>
       <div class="typing"><i></i><i></i><i></i></div>
-      <div class="bubble">Marcus — your Wedding Crasher extracts just restocked, and there's 15% off through Sunday. We saved you one. 🌿</div>
+      <div class="bubble"><span class="tapback">❤️</span>Marcus — your Wedding Crasher extracts just restocked, and there's 15% off through Sunday. We saved you one. 🌿</div>
+      <div class="read-receipt">READ 10:14 AM</div>
+      <div class="reply-bubble">🙌 saving it for tomorrow</div>
       <div class="speed-badge">⚡ WRITTEN FROM HIS HISTORY · &lt;5 SECONDS</div>
-      <div class="deliv">DELIVERED · 98% OPEN RATE</div>
     </div>
   </section>
 
@@ -607,6 +627,11 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
       <div class="s seq" style="--ed:3.25s"><span class="v">100<em>%</em></span><span class="k">Compliant</span></div>
       <div class="s seq" style="--ed:3.5s"><span class="v">98<em>%</em></span><span class="k">Open Rate</span></div>
     </div>
+    <div class="imsg-row">
+      <span class="imsg-chip hero seq" style="--ed:4.0s">💙 FULL iMESSAGE — BLUE TEXTS, OFF YOUR SHOP'S OWN iPHONE</span>
+      <span class="imsg-chip seq" style="--ed:4.4s">READ RECEIPTS · TAPBACKS · TYPING</span>
+      <span class="imsg-chip seq" style="--ed:4.7s">SMS FALLBACK FOR ANDROID</span>
+    </div>
   </section>
 
   <!-- SCENE 9 · PROOF -->
@@ -665,16 +690,16 @@ const scenes = [
   { id:'scene5',  inAt: 25.4, outAt: 35.8 },
   { id:'scene6',  inAt: 35.8, outAt: 50.4 },
   { id:'scene7',  inAt: 50.4, outAt: 58.4 },
-  { id:'scene8',  inAt: 58.4, outAt: 64.4 },
-  { id:'scene9',  inAt: 64.4, outAt: 72.4 },
-  { id:'scene10', inAt: 72.4, outAt: 79.0 },
+  { id:'scene8',  inAt: 58.4, outAt: 65.4 },
+  { id:'scene9',  inAt: 65.4, outAt: 73.4 },
+  { id:'scene10', inAt: 73.4, outAt: 80.0 },
 ];
-const TOTAL = 79.0;
+const TOTAL = 80.0;
 
 const tickers = [
-  { el:'m1', start:66.0, end:68.2, from:0, to:13706, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
-  { el:'m2', start:66.3, end:68.5, from:0, to:22.4,  fmt:v=>v.toFixed(1)+'%' },
-  { el:'m3', start:66.6, end:69.0, from:0, to:61,    fmt:v=>Math.round(v)+'%' },
+  { el:'m1', start:67.0, end:69.2, from:0, to:13706, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
+  { el:'m2', start:67.3, end:69.5, from:0, to:22.4,  fmt:v=>v.toFixed(1)+'%' },
+  { el:'m3', start:67.6, end:70.0, from:0, to:61,    fmt:v=>Math.round(v)+'%' },
 ];
 const easeOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
 
