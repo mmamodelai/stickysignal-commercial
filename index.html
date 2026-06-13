@@ -447,10 +447,77 @@ body.is-phone .pipe-line{width:16px}
 body.is-phone .blocked-row{gap:6px}
 body.is-phone .blocked-chip{font-size:8.5px;padding:5px 10px}
 body.is-phone .metrics{gap:9px;margin-top:14px}
-body.is-phone .metric{width:88vw;padding:13px 16px;display:flex;align-items:baseline;gap:14px}
+body.is-phone .metric{width:88vw;padding:14px 18px;display:flex;align-items:baseline;gap:14px}
 body.is-phone .metric .lbl{margin-top:0;text-align:left}
-body.is-phone .orbit-wrap{width:min(72vw,300px);height:min(72vw,300px)}
-body.is-phone .ladder{height:120px}
+body.is-phone .ladder{height:130px}
+
+/* phone: BRIGHTER — soften vignette/grain, lift secondary text */
+body.is-phone{--text2:#b9c5d6;--muted:#9298a6}
+body.is-phone .vignette{background:radial-gradient(ellipse at center,transparent 62%,rgba(0,0,0,.42) 100%)}
+body.is-phone .grain{opacity:.05}
+body.is-phone #stage::before{background:radial-gradient(ellipse 80% 60% at 50% 42%,rgba(16,185,129,.13) 0%,rgba(6,182,212,.06) 45%,transparent 78%)}
+
+/* phone: BIGGER TYPE — use the real estate */
+body.is-phone .scene{padding:4.5vh 4vw}
+body.is-phone .eyebrow{font-size:12.5px;letter-spacing:.22em;margin-bottom:12px}
+body.is-phone .headline{font-size:clamp(32px,8.8vw,44px)}
+body.is-phone .sub{font-size:15.5px;max-width:90vw}
+body.is-phone #scene5b .headline,body.is-phone #scene6 .headline{font-size:clamp(27px,7.4vw,36px)}
+body.is-phone .prob-card .ic{font-size:24px}
+body.is-phone .prob-card h4{font-size:17.5px}
+body.is-phone .prob-card p{font-size:13.5px}
+body.is-phone .orbit-wrap{width:min(84vw,360px);height:min(84vw,360px);margin-top:18px}
+body.is-phone .orbit-node{font-size:12.5px;padding:10px 16px}
+body.is-phone .orbit-node.core{font-size:14.5px;padding:14px 22px}
+body.is-phone .ltv-chip{font-size:15px}
+body.is-phone .ladder-label{font-size:12px}
+body.is-phone .checkin-toast{font-size:11.5px}
+body.is-phone .sr-top .nm{font-size:17.5px}
+body.is-phone .sr-top .meta{font-size:10px}
+body.is-phone .sr-chip{font-size:9.5px}
+body.is-phone .sr-statrow .s .v{font-size:20px}
+body.is-phone .sr-statrow .s .k{font-size:9px}
+body.is-phone .sr-visits .hd{font-size:10px}
+body.is-phone .sr-vrow{font-size:13.5px}
+body.is-phone .sr-vrow .dt,body.is-phone .sr-vrow .bt{font-size:10px}
+body.is-phone .ai-pitch,body.is-phone .greet{font-size:14.5px}
+body.is-phone .ai-pitch .tag,body.is-phone .greet .tag{font-size:9.5px}
+body.is-phone .vip-chip{font-size:13px}
+body.is-phone .rec-hd{font-size:10.5px}
+body.is-phone .rec-card .nm{font-size:15.5px}
+body.is-phone .rec-card .aff{font-size:11px}
+body.is-phone .moved-banner{font-size:11.5px}
+body.is-phone .flow-step{font-size:14px}
+body.is-phone .vs-card .vh{font-size:11px}
+body.is-phone .vs-foot{font-size:11.5px}
+body.is-phone .us-bubble,body.is-phone .us-direct{font-size:14px}
+body.is-phone .blocked-chip{font-size:10px;padding:6px 12px}
+body.is-phone .metric .num{font-size:36px}
+body.is-phone .metric .lbl{font-size:11px}
+body.is-phone .line-chip{font-size:12.5px}
+body.is-phone .stat-strip .v{font-size:26px}
+body.is-phone .v15-chip{font-size:13.5px}
+body.is-phone #scene10 .tag{font-size:19px}
+body.is-phone .fp-alert{font-size:11px}
+body.is-phone .fp-name{font-size:13px}
+body.is-phone .fp-bubble,body.is-phone .fp-reply,body.is-phone .fp-msg{font-size:17px}
+body.is-phone .fp-msg .sig{font-size:10.5px}
+body.is-phone .fp-read{font-size:11px}
+body.is-phone .fp-stamp{font-size:11px}
+body.is-phone .fp-foot{font-size:11px}
+
+/* hold-to-pause indicator + phone gesture hint */
+.hold-hint{position:fixed;bottom:calc(5vh + 20px);left:50%;transform:translateX(-50%);z-index:80;
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--fg);
+  background:rgba(17,24,39,.88);border:1px solid var(--border);border-radius:99px;padding:9px 18px;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;white-space:nowrap}
+.hold-hint.show{opacity:1}
+body.is-phone .hold-hint{bottom:calc(3vh + 20px)}
+.tap-hint{display:none}
+body.is-phone .tap-hint{display:block;position:fixed;bottom:calc(3vh + 14px);left:50%;
+  transform:translateX(-50%);z-index:75;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  color:var(--text2);opacity:0;transition:opacity .6s ease;pointer-events:none;white-space:nowrap}
+body.is-phone[data-scene="scene1"] .tap-hint{opacity:.95}
 </style>
 </head>
 <body>
@@ -625,7 +692,7 @@ body.is-phone .ladder{height:120px}
       <div class="fp-status"><span>10:14</span><span class="fp-icons">5G <i class="batt"></i></span></div>
       <div class="fp-header">
         <span class="fp-back">‹</span>
-        <div class="fp-contact"><div class="fp-av">S</div><div class="fp-name">Sticky's 🌿</div></div>
+        <div class="fp-contact"><div class="fp-av">D</div><div class="fp-name">Dispensary 🌿</div></div>
       </div>
       <div class="fp-thread">
         <div class="fp-stamp">iMessage · Today 10:12 AM</div>
@@ -674,7 +741,7 @@ body.is-phone .ladder{height:120px}
       <div class="fp-status"><span>2:36</span><span class="fp-icons">5G <i class="batt"></i></span></div>
       <div class="fp-header">
         <span class="fp-back">‹</span>
-        <div class="fp-contact"><div class="fp-av">S</div><div class="fp-name">Sticky's 🌿</div></div>
+        <div class="fp-contact"><div class="fp-av">D</div><div class="fp-name">Dispensary 🌿</div></div>
       </div>
       <div class="fp-thread">
         <div class="fp-stamp">iMessage · Today 2:36 PM</div>
@@ -873,7 +940,9 @@ body.is-phone .ladder{height:120px}
 <div class="hud"><span class="dot"></span><span>STICKYSIGNAL · PRODUCT REEL V2</span></div>
 <div class="timecode" id="tc">00:00:00</div>
 <div class="rail"><div class="fill" id="railFill"></div></div>
-<div class="hint">SPACE PAUSE · → SKIP · R REPLAY</div>
+<div class="hint">SPACE PAUSE · ←/→ SKIP · R REPLAY</div>
+<div class="hold-hint" id="holdHint">⏸ PAUSED — RELEASE TO PLAY</div>
+<div class="tap-hint">TAP RIGHT ▶ · TAP LEFT ◀ · HOLD ⏸</div>
 
 <script>
 // ---------- adaptive phone mode (?mode=phone | ?mode=desktop forces it) ----------
@@ -978,12 +1047,50 @@ function skipNext(){
   pausedOffset -= (next.inAt - t) * 1000;
 }
 
+function seekTo(time){ pausedOffset += (currentT() - time) * 1000; }
+function skipPrev(){
+  const t = currentT();
+  let idx = scenes.findIndex(s => t >= s.inAt && t < s.outAt);
+  if (idx === -1) idx = scenes.length - 1;
+  if (t - scenes[idx].inAt > 1.5 || idx === 0) seekTo(scenes[idx].inAt);
+  else seekTo(scenes[idx - 1].inAt);
+}
+
 window.addEventListener('keydown', e => {
   if (e.key === ' '){ e.preventDefault(); togglePause(); }
   else if (e.key === 'r' || e.key === 'R'){ reset(); }
   else if (e.key === 'ArrowRight'){ skipNext(); }
+  else if (e.key === 'ArrowLeft'){ skipPrev(); }
 });
-window.addEventListener('pointerdown', () => skipNext());
+
+// touch: tap right = next, tap left = back, HOLD = pause (release resumes), pinch = browser zoom
+const holdHintEl = document.getElementById('holdHint');
+const activePtrs = new Set();
+let holdTimer = null, held = false, multi = false, downX = 0;
+window.addEventListener('pointerdown', e => {
+  activePtrs.add(e.pointerId);
+  if (activePtrs.size > 1){ clearTimeout(holdTimer); multi = true; return; } // two fingers = pinch zoom, hands off
+  multi = false; downX = e.clientX;
+  holdTimer = setTimeout(() => {
+    held = true;
+    if (pausedAt === null) togglePause();
+    holdHintEl.classList.add('show');
+  }, 260);
+});
+function endPointer(e){
+  activePtrs.delete(e.pointerId);
+  clearTimeout(holdTimer);
+  if (activePtrs.size > 0) return;           // wait for the last finger
+  if (held){                                  // release after hold -> resume
+    if (pausedAt !== null) togglePause();
+    holdHintEl.classList.remove('show');
+    held = false; multi = false; return;
+  }
+  if (multi){ multi = false; return; }        // it was a pinch, not a tap
+  if (downX < innerWidth * 0.33) skipPrev(); else skipNext();
+}
+window.addEventListener('pointerup', endPointer);
+window.addEventListener('pointercancel', endPointer);
 </script>
 </body>
 </html>
