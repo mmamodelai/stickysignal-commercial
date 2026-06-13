@@ -343,20 +343,88 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 #scene10 .url{margin-top:clamp(18px,3vh,32px);font-family:var(--mono);font-size:clamp(12px,1.4vw,16px);
   letter-spacing:.3em;text-transform:uppercase;color:var(--primary-light)}
 
-/* ---------- MOBILE ---------- */
-@media (max-width:768px){
-  .hud,.timecode,.hint{display:none}
-  .letterbox{height:3vh}
-  .rail{bottom:3vh}
-  .scene{padding:5vh 5vw}
-  #scene5{flex-direction:column;gap:16px}
-  #scene5 .left{align-items:center;text-align:center}
-  #scene5 .headline{text-align:center}
-  .sr-chips{margin-left:0}
-  .sr-vrow .bt{display:none}
-  .pitch-row{flex-direction:column}
-  .prob-card{width:86vw}
-}
+/* ============ FIRST-PERSON iMESSAGE TAKEOVER (phone mode, scene 5) ============ */
+.fp-imsg{display:none}
+body.is-phone #scene5 .left,body.is-phone #scene5 .phone{display:none}
+body.is-phone .fp-imsg{display:flex;flex-direction:column;position:absolute;inset:0;background:#000;
+  opacity:0;transform:scale(1.18)}
+body.is-phone #scene5.active .fp-imsg{animation:fpZoom .9s cubic-bezier(.22,1,.36,1) .2s forwards}
+@keyframes fpZoom{to{opacity:1;transform:scale(1)}}
+.fp-alert{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--warning);
+  text-align:center;padding:10px 14px 6px;opacity:0}
+body.is-phone #scene5.active .fp-alert{animation:fpFade .6s ease 1.0s forwards}
+@keyframes fpFade{to{opacity:1}}
+.fp-status{display:flex;justify-content:space-between;align-items:center;padding:8px 22px 4px;
+  font-family:var(--mono);font-size:13px;font-weight:600;color:#fff}
+.fp-status .fp-icons{display:flex;align-items:center;gap:7px;font-size:10.5px;letter-spacing:.05em}
+.fp-status .batt{display:inline-block;width:22px;height:11px;border:1.5px solid rgba(255,255,255,.8);
+  border-radius:3px;position:relative}
+.fp-status .batt::before{content:'';position:absolute;inset:1.5px;right:5px;background:#34d399;border-radius:1px}
+.fp-status .batt::after{content:'';position:absolute;right:-4px;top:2.5px;width:2px;height:4px;
+  background:rgba(255,255,255,.8);border-radius:0 1px 1px 0}
+.fp-header{display:flex;align-items:center;padding:6px 14px 12px;border-bottom:.5px solid rgba(148,163,184,.25)}
+.fp-back{color:#0a84ff;font-size:30px;line-height:1;font-weight:300;width:34px}
+.fp-contact{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;margin-right:34px}
+.fp-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:#06281d;font-size:18px}
+.fp-name{font-size:11.5px;color:var(--text);font-weight:500}
+.fp-thread{flex:1;display:flex;flex-direction:column;padding:16px 16px 0;overflow:hidden;text-align:left}
+.fp-stamp{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center;
+  letter-spacing:.06em;margin-bottom:14px;opacity:0}
+body.is-phone #scene5.active .fp-stamp{animation:fpFade .5s ease 1.4s forwards}
+.fp-typing{display:flex;gap:5px;padding:13px 15px;background:#2c2c2e;border-radius:18px 18px 4px 18px;
+  width:max-content;margin-left:auto;opacity:0;margin-bottom:10px;overflow:hidden;max-height:46px}
+body.is-phone #scene5.active .fp-typing{animation:typeShow .35s ease 2.0s forwards,typeHide .35s ease 3.2s forwards}
+.fp-typing i{width:8px;height:8px;border-radius:50%;background:var(--text2);animation:tdot 1s ease infinite}
+.fp-typing i:nth-child(2){animation-delay:.18s}.fp-typing i:nth-child(3){animation-delay:.36s}
+.fp-bubble{position:relative;background:linear-gradient(135deg,#0a84ff,#0060df);color:#fff;
+  border-radius:18px 18px 4px 18px;padding:13px 15px;font-size:15px;line-height:1.45;
+  margin-left:auto;max-width:84%;opacity:0;transform:translateY(14px) scale(.95)}
+body.is-phone #scene5.active .fp-bubble{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 3.4s forwards}
+.fp-tap{position:absolute;top:-14px;left:-12px;width:28px;height:28px;border-radius:50%;
+  background:#1c1c1e;border:1.5px solid #0a84ff;display:flex;align-items:center;justify-content:center;
+  font-size:13px;opacity:0;transform:scale(.3)}
+body.is-phone #scene5.active .fp-tap{animation:tapbackPop .4s cubic-bezier(.34,1.56,.64,1) 5.8s forwards}
+.fp-read{font-family:var(--mono);font-size:10.5px;color:var(--text2);text-align:right;
+  margin-top:7px;letter-spacing:.08em;opacity:0}
+body.is-phone #scene5.active .fp-read{animation:fpFade .5s ease 5.0s forwards}
+.fp-reply{background:#2c2c2e;color:var(--text);border-radius:18px 18px 18px 4px;
+  padding:12px 14px;font-size:15px;line-height:1.4;margin-top:12px;max-width:74%;
+  opacity:0;transform:translateY(12px)}
+body.is-phone #scene5.active .fp-reply{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 6.6s forwards}
+.fp-foot{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--accent-light);
+  text-align:center;padding:12px 16px calc(3vh + 18px);opacity:0}
+body.is-phone #scene5.active .fp-foot{animation:fpFade .6s ease 7.6s forwards}
+/* full-bleed: drop the bars while the takeover plays */
+body.is-phone[data-scene="scene5"] .letterbox,body.is-phone[data-scene="scene5"] .vignette,
+body.is-phone[data-scene="scene5"] .grain{opacity:0;transition:opacity .4s ease}
+
+/* ---------- PHONE MODE (body.is-phone — class-driven, ?mode= overridable) ---------- */
+body.is-phone .hud,body.is-phone .timecode,body.is-phone .hint{display:none}
+body.is-phone .letterbox{height:3vh}
+body.is-phone .rail{bottom:3vh}
+body.is-phone .scene{padding:5vh 5vw}
+body.is-phone .prob-row{gap:9px;margin-top:14px}
+body.is-phone .prob-card{width:88vw;padding:11px 15px}
+body.is-phone .prob-card p{font-size:11px}
+body.is-phone .sr-dash{width:94vw;padding:11px 12px}
+body.is-phone .sr-chips{margin-left:0;margin-top:6px}
+body.is-phone .sr-vrow .bt{font-size:8.5px}
+body.is-phone .sr-vrow .items small{display:none}
+body.is-phone .pitch-row{flex-direction:column;width:94vw;gap:8px}
+body.is-phone .vip-chip{margin-top:8px}
+body.is-phone .vs-row{gap:9px;margin-top:12px}
+body.is-phone .vs-card{width:88vw;padding:11px 14px}
+body.is-phone .pipe-wrap{gap:6px;font-size:8.5px;margin-top:14px}
+body.is-phone .pipe-node{padding:8px 10px}
+body.is-phone .pipe-line{width:16px}
+body.is-phone .blocked-row{gap:6px}
+body.is-phone .blocked-chip{font-size:8.5px;padding:5px 10px}
+body.is-phone .metrics{gap:9px;margin-top:14px}
+body.is-phone .metric{width:88vw;padding:13px 16px;display:flex;align-items:baseline;gap:14px}
+body.is-phone .metric .lbl{margin-top:0;text-align:left}
+body.is-phone .orbit-wrap{width:min(72vw,300px);height:min(72vw,300px)}
+body.is-phone .ladder{height:120px}
 </style>
 </head>
 <body>
@@ -524,6 +592,23 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
       <div class="read-receipt">READ 10:14 AM</div>
       <div class="reply-bubble">🙌 saving it for tomorrow</div>
       <div class="speed-badge">⚡ WRITTEN FROM HIS HISTORY · &lt;5 SECONDS</div>
+    </div>
+    <!-- phone mode: the viewer's screen BECOMES Marcus's iPhone -->
+    <div class="fp-imsg">
+      <div class="fp-alert">⚠ MARCUS BROKE HIS RHYTHM — AI WIN-BACK SENT</div>
+      <div class="fp-status"><span>10:14</span><span class="fp-icons">5G <i class="batt"></i></span></div>
+      <div class="fp-header">
+        <span class="fp-back">‹</span>
+        <div class="fp-contact"><div class="fp-av">S</div><div class="fp-name">Sticky's 🌿</div></div>
+      </div>
+      <div class="fp-thread">
+        <div class="fp-stamp">iMessage · Today 10:12 AM</div>
+        <div class="fp-typing"><i></i><i></i><i></i></div>
+        <div class="fp-bubble"><span class="fp-tap">❤️</span>Marcus — your Wedding Crasher extracts just restocked, and there's 15% off through Sunday. We saved you one. 🌿</div>
+        <div class="fp-read">Read 10:14 AM</div>
+        <div class="fp-reply">🙌 saving it for tomorrow</div>
+      </div>
+      <div class="fp-foot">⚡ WRITTEN FROM HIS HISTORY IN &lt;5s · SENT OFF YOUR SHOP'S iPHONE</div>
     </div>
   </section>
 
@@ -714,6 +799,21 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 <div class="hint">SPACE PAUSE · → SKIP · R REPLAY</div>
 
 <script>
+// ---------- adaptive phone mode (?mode=phone | ?mode=desktop forces it) ----------
+const forcedMode = new URLSearchParams(location.search).get('mode');
+function isPhone() {
+  if (forcedMode === 'phone') return true;
+  if (forcedMode === 'desktop') return false;
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  return innerWidth < 700 || (coarse && innerWidth < innerHeight && innerWidth < 1024);
+}
+function applyMode() {
+  document.body.classList.toggle('is-phone', isPhone());
+}
+applyMode();
+window.addEventListener('resize', applyMode);
+window.addEventListener('orientationchange', applyMode);
+
 const scenes = [
   { id:'scene1',  inAt: 0.0,  outAt: 4.8 },
   { id:'scene2',  inAt: 4.8,  outAt: 11.8 },
@@ -747,16 +847,19 @@ function loop(now){
   if (pausedAt !== null) t = (pausedAt - startTime - pausedOffset) / 1000;
   if (t > TOTAL) t = TOTAL;
 
+  let liveScene = '';
   for (const s of scenes){
     const el = document.getElementById(s.id);
     if (t >= s.inAt && t < s.outAt){
       el.classList.add('active'); el.classList.remove('exiting');
+      liveScene = s.id;
     } else if (t >= s.outAt && t < s.outAt + 0.5){
       el.classList.remove('active'); el.classList.add('exiting');
     } else {
       el.classList.remove('active','exiting');
     }
   }
+  if (document.body.dataset.scene !== liveScene) document.body.dataset.scene = liveScene;
 
   for (const k of tickers){
     const el = document.getElementById(k.el);
