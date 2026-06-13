@@ -215,6 +215,31 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
   opacity:0;transition:opacity .5s ease 6.2s}
 #scene5.active .deliv{opacity:1}
 
+/* ============ SCENE 5B — TWO-WAY LINE (conversation) ============ */
+#scene5b{flex-direction:row;gap:clamp(20px,4vw,60px);flex-wrap:wrap;align-content:center}
+#scene5b .left{max-width:min(440px,88vw);text-align:left;display:flex;flex-direction:column;align-items:flex-start}
+#scene5b .headline{font-size:clamp(25px,3.4vw,44px);max-width:15ch;text-align:left}
+.line-chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);
+  font-size:clamp(9.5px,1.05vw,12px);letter-spacing:.08em;color:var(--accent-light);
+  border:1px solid rgba(6,182,212,.45);background:rgba(6,182,212,.07);border-radius:99px;
+  padding:7px 14px;margin-top:10px}
+.conv{display:flex;flex-direction:column;text-align:left}
+.conv .cb{border-radius:14px;padding:9px 12px;font-size:clamp(11px,1.15vw,13px);line-height:1.45;
+  margin-top:8px;max-width:88%}
+.conv .cb.in{background:#2c2c2e;color:var(--text);border-radius:14px 14px 14px 4px;margin-right:auto}
+.conv .cb.out{background:linear-gradient(135deg,#0a84ff,#0060df);color:#fff;
+  border-radius:14px 14px 4px 14px;margin-left:auto}
+.conv .cb .sig{display:block;margin-top:5px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.08em;opacity:.8}
+/* phone-mode conversation bubbles: generic delayed entrance via --fd */
+.fp-msg{border-radius:18px;padding:12px 14px;font-size:14.5px;line-height:1.42;margin-top:10px;
+  max-width:82%;opacity:0;transform:translateY(12px);text-align:left}
+.fp-msg.in{background:#2c2c2e;color:var(--text);border-radius:18px 18px 18px 4px;margin-right:auto}
+.fp-msg.out{background:linear-gradient(135deg,#0a84ff,#0060df);color:#fff;
+  border-radius:18px 18px 4px 18px;margin-left:auto}
+.fp-msg .sig{display:block;margin-top:6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;opacity:.85}
+body.is-phone .scene.active .fp-msg{animation:bubbleIn .45s cubic-bezier(.22,1,.36,1) var(--fd,.5s) forwards}
+
 /* ============ SCENE 6 — HERO: SMART SHOWROOM CHECK-IN ============ */
 #scene6 .headline{font-size:clamp(24px,3.4vw,42px)}
 .checkin-toast{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);
@@ -345,14 +370,14 @@ html,body{height:100%;overflow:hidden;background:#000;color:var(--text);font-fam
 
 /* ============ FIRST-PERSON iMESSAGE TAKEOVER (phone mode, scene 5) ============ */
 .fp-imsg{display:none}
-body.is-phone #scene5 .left,body.is-phone #scene5 .phone{display:none}
+body.is-phone #scene5 .left,body.is-phone #scene5 .phone,body.is-phone #scene5b .left,body.is-phone #scene5b .phone{display:none}
 body.is-phone .fp-imsg{display:flex;flex-direction:column;position:absolute;inset:0;background:#000;
   opacity:0;transform:scale(1.18)}
-body.is-phone #scene5.active .fp-imsg{animation:fpZoom .9s cubic-bezier(.22,1,.36,1) .2s forwards}
+body.is-phone .scene.active .fp-imsg{animation:fpZoom .9s cubic-bezier(.22,1,.36,1) .2s forwards}
 @keyframes fpZoom{to{opacity:1;transform:scale(1)}}
 .fp-alert{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--warning);
   text-align:center;padding:10px 14px 6px;opacity:0}
-body.is-phone #scene5.active .fp-alert{animation:fpFade .6s ease 1.0s forwards}
+body.is-phone .scene.active .fp-alert{animation:fpFade .6s ease 1.0s forwards}
 @keyframes fpFade{to{opacity:1}}
 .fp-status{display:flex;justify-content:space-between;align-items:center;padding:8px 22px 4px;
   font-family:var(--mono);font-size:13px;font-weight:600;color:#fff}
@@ -371,33 +396,34 @@ body.is-phone #scene5.active .fp-alert{animation:fpFade .6s ease 1.0s forwards}
 .fp-thread{flex:1;display:flex;flex-direction:column;padding:16px 16px 0;overflow:hidden;text-align:left}
 .fp-stamp{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center;
   letter-spacing:.06em;margin-bottom:14px;opacity:0}
-body.is-phone #scene5.active .fp-stamp{animation:fpFade .5s ease 1.4s forwards}
+body.is-phone .scene.active .fp-stamp{animation:fpFade .5s ease 1.4s forwards}
 .fp-typing{display:flex;gap:5px;padding:13px 15px;background:#2c2c2e;border-radius:18px 18px 4px 18px;
   width:max-content;margin-left:auto;opacity:0;margin-bottom:10px;overflow:hidden;max-height:46px}
-body.is-phone #scene5.active .fp-typing{animation:typeShow .35s ease 2.0s forwards,typeHide .35s ease 3.2s forwards}
+body.is-phone .scene.active .fp-typing{animation:typeShow .35s ease 2.0s forwards,typeHide .35s ease 3.2s forwards}
 .fp-typing i{width:8px;height:8px;border-radius:50%;background:var(--text2);animation:tdot 1s ease infinite}
 .fp-typing i:nth-child(2){animation-delay:.18s}.fp-typing i:nth-child(3){animation-delay:.36s}
 .fp-bubble{position:relative;background:linear-gradient(135deg,#0a84ff,#0060df);color:#fff;
   border-radius:18px 18px 4px 18px;padding:13px 15px;font-size:15px;line-height:1.45;
   margin-left:auto;max-width:84%;opacity:0;transform:translateY(14px) scale(.95)}
-body.is-phone #scene5.active .fp-bubble{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 3.4s forwards}
+body.is-phone .scene.active .fp-bubble{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 3.4s forwards}
 .fp-tap{position:absolute;top:-14px;left:-12px;width:28px;height:28px;border-radius:50%;
   background:#1c1c1e;border:1.5px solid #0a84ff;display:flex;align-items:center;justify-content:center;
   font-size:13px;opacity:0;transform:scale(.3)}
-body.is-phone #scene5.active .fp-tap{animation:tapbackPop .4s cubic-bezier(.34,1.56,.64,1) 5.8s forwards}
+body.is-phone .scene.active .fp-tap{animation:tapbackPop .4s cubic-bezier(.34,1.56,.64,1) 5.8s forwards}
 .fp-read{font-family:var(--mono);font-size:10.5px;color:var(--text2);text-align:right;
   margin-top:7px;letter-spacing:.08em;opacity:0}
-body.is-phone #scene5.active .fp-read{animation:fpFade .5s ease 5.0s forwards}
+body.is-phone .scene.active .fp-read{animation:fpFade .5s ease 5.0s forwards}
 .fp-reply{background:#2c2c2e;color:var(--text);border-radius:18px 18px 18px 4px;
   padding:12px 14px;font-size:15px;line-height:1.4;margin-top:12px;max-width:74%;
   opacity:0;transform:translateY(12px)}
-body.is-phone #scene5.active .fp-reply{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 6.6s forwards}
+body.is-phone .scene.active .fp-reply{animation:bubbleIn .5s cubic-bezier(.22,1,.36,1) 6.6s forwards}
 .fp-foot{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--accent-light);
   text-align:center;padding:12px 16px calc(3vh + 18px);opacity:0}
-body.is-phone #scene5.active .fp-foot{animation:fpFade .6s ease 7.6s forwards}
+body.is-phone .scene.active .fp-foot{animation:fpFade .6s ease 7.6s forwards}
 /* full-bleed: drop the bars while the takeover plays */
 body.is-phone[data-scene="scene5"] .letterbox,body.is-phone[data-scene="scene5"] .vignette,
-body.is-phone[data-scene="scene5"] .grain{opacity:0;transition:opacity .4s ease}
+body.is-phone[data-scene="scene5"] .grain,body.is-phone[data-scene="scene5b"] .letterbox,
+body.is-phone[data-scene="scene5b"] .vignette,body.is-phone[data-scene="scene5b"] .grain{opacity:0;transition:opacity .4s ease}
 
 /* ---------- PHONE MODE (body.is-phone — class-driven, ?mode= overridable) ---------- */
 body.is-phone .hud,body.is-phone .timecode,body.is-phone .hint{display:none}
@@ -612,9 +638,60 @@ body.is-phone .ladder{height:120px}
     </div>
   </section>
 
+  <!-- SCENE 5B · THE TWO-WAY LINE -->
+  <section class="scene" id="scene5b">
+    <div class="left">
+      <div class="eyebrow" style="--d:.1">05 · THE TWO-WAY LINE</div>
+      <h1 class="headline">
+        <span class="w" style="--d:.3">A</span>
+        <span class="w" style="--d:.45">Slack</span>
+        <span class="w" style="--d:.65">channel</span>
+        <span class="w" style="--d:.85">between</span>
+        <span class="w" style="--d:1.05">your</span>
+        <span class="w" style="--d:1.2">shop</span>
+        <span class="w" style="--d:1.4">and</span>
+        <span class="w acc" style="--d:1.65">every customer.</span>
+      </h1>
+      <div class="line-chip seq" style="--ed:2.2s">📲 REPLY FROM YOUR POCKET</div>
+      <div class="line-chip seq" style="--ed:2.5s">🚀 100+ PERSONALIZED OPENERS A DAY</div>
+      <div class="line-chip seq" style="--ed:2.8s">🧠 AI DRAFTS · HUMANS APPROVE</div>
+    </div>
+    <div class="phone seq" style="--ed:3.0s">
+      <div class="notch"></div>
+      <div class="from">💬 ANY QUESTION · THE RIGHT HUMAN ANSWERS</div>
+      <div class="conv">
+        <div class="cb in seq" style="--ed:3.5s">Hey — what pesticides do you use?</div>
+        <div class="cb out seq" style="--ed:4.4s">None. Predatory bugs do the work — dragonflies &amp; grasshoppers. 🦗<span class="sig">— MIKE, GROWER</span></div>
+        <div class="cb in seq" style="--ed:5.4s">Can I get a solventless vape cart?</div>
+        <div class="cb out seq" style="--ed:6.3s">3 in stock: Rosin Drop 1g $45 · Live Rosin ½g $30 · Solventless OG 1g $50</div>
+        <div class="cb in seq" style="--ed:7.3s">Rosin Drop 👌</div>
+        <div class="cb out seq" style="--ed:8.2s">$45 — it'll be waiting with security up front. 🤝</div>
+      </div>
+    </div>
+    <!-- phone mode: second first-person takeover -->
+    <div class="fp-imsg">
+      <div class="fp-alert">💬 EVERY REPLY ROUTED TO THE RIGHT HUMAN</div>
+      <div class="fp-status"><span>2:36</span><span class="fp-icons">5G <i class="batt"></i></span></div>
+      <div class="fp-header">
+        <span class="fp-back">‹</span>
+        <div class="fp-contact"><div class="fp-av">S</div><div class="fp-name">Sticky's 🌿</div></div>
+      </div>
+      <div class="fp-thread">
+        <div class="fp-stamp">iMessage · Today 2:36 PM</div>
+        <div class="fp-msg in" style="--fd:1.8s">Hey — what pesticides do you use?</div>
+        <div class="fp-msg out" style="--fd:3.2s">None. Predatory bugs do the work — dragonflies &amp; grasshoppers. 🦗<span class="sig">— MIKE, GROWER</span></div>
+        <div class="fp-msg in" style="--fd:4.8s">Can I get a solventless vape cart?</div>
+        <div class="fp-msg out" style="--fd:6.2s">3 in stock: Rosin Drop 1g $45 · Live Rosin ½g $30 · Solventless OG 1g $50</div>
+        <div class="fp-msg in" style="--fd:7.6s">Rosin Drop 👌</div>
+        <div class="fp-msg out" style="--fd:8.8s">$45 — it'll be waiting with security up front. 🤝</div>
+      </div>
+      <div class="fp-foot">📲 REPLY FROM YOUR POCKET · 100+ OPENERS/DAY · AI DRAFTS, HUMANS APPROVE</div>
+    </div>
+  </section>
+
   <!-- SCENE 6 · HERO: SMART SHOWROOM -->
   <section class="scene" id="scene6">
-    <div class="eyebrow" style="--d:.1">05 · THE SMART SHOWROOM</div>
+    <div class="eyebrow" style="--d:.1">06 · THE SMART SHOWROOM</div>
     <h1 class="headline">
       <span class="w" style="--d:.3">Two</span>
       <span class="w" style="--d:.5">days</span>
@@ -678,7 +755,7 @@ body.is-phone .ladder{height:120px}
 
   <!-- SCENE 7 · INVENTORY × AFFINITY -->
   <section class="scene" id="scene7">
-    <div class="eyebrow" style="--d:.1">06 · INVENTORY INTELLIGENCE</div>
+    <div class="eyebrow" style="--d:.1">07 · INVENTORY INTELLIGENCE</div>
     <h1 class="headline">
       <span class="w" style="--d:.3">Dead</span>
       <span class="w" style="--d:.5">stock</span>
@@ -711,7 +788,7 @@ body.is-phone .ladder{height:120px}
 
   <!-- SCENE 8 · THE MOAT -->
   <section class="scene" id="scene8">
-    <div class="eyebrow" style="--d:.1">07 · THE MOAT</div>
+    <div class="eyebrow" style="--d:.1">08 · THE MOAT</div>
     <h1 class="headline">
       <span class="w" style="--d:.3">They</span>
       <span class="w" style="--d:.5">all</span>
@@ -753,7 +830,7 @@ body.is-phone .ladder{height:120px}
 
   <!-- SCENE 9 · PROOF -->
   <section class="scene" id="scene9">
-    <div class="eyebrow" style="--d:.1">08 · THE PROOF</div>
+    <div class="eyebrow" style="--d:.1">09 · THE PROOF</div>
     <h1 class="headline">
       <span class="w" style="--d:.3">Not</span>
       <span class="w" style="--d:.5">theory.</span>
@@ -820,18 +897,19 @@ const scenes = [
   { id:'scene3',  inAt: 11.8, outAt: 18.2 },
   { id:'scene4',  inAt: 18.2, outAt: 25.4 },
   { id:'scene5',  inAt: 25.4, outAt: 35.8 },
-  { id:'scene6',  inAt: 35.8, outAt: 50.4 },
-  { id:'scene7',  inAt: 50.4, outAt: 58.4 },
-  { id:'scene8',  inAt: 58.4, outAt: 68.4 },
-  { id:'scene9',  inAt: 68.4, outAt: 76.4 },
-  { id:'scene10', inAt: 76.4, outAt: 83.0 },
+  { id:'scene5b', inAt: 35.8, outAt: 49.0 },
+  { id:'scene6',  inAt: 49.0, outAt: 63.6 },
+  { id:'scene7',  inAt: 63.6, outAt: 71.6 },
+  { id:'scene8',  inAt: 71.6, outAt: 81.6 },
+  { id:'scene9',  inAt: 81.6, outAt: 89.6 },
+  { id:'scene10', inAt: 89.6, outAt: 96.0 },
 ];
-const TOTAL = 83.0;
+const TOTAL = 96.0;
 
 const tickers = [
-  { el:'m1', start:70.0, end:72.2, from:0, to:13706, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
-  { el:'m2', start:70.3, end:72.5, from:0, to:22.4,  fmt:v=>v.toFixed(1)+'%' },
-  { el:'m3', start:70.6, end:73.0, from:0, to:61,    fmt:v=>Math.round(v)+'%' },
+  { el:'m1', start:83.2, end:85.4, from:0, to:13706, fmt:v=>'$'+Math.round(v).toLocaleString('en-US') },
+  { el:'m2', start:83.5, end:85.7, from:0, to:22.4,  fmt:v=>v.toFixed(1)+'%' },
+  { el:'m3', start:83.8, end:86.4, from:0, to:61,    fmt:v=>Math.round(v)+'%' },
 ];
 const easeOutExpo = x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
 
